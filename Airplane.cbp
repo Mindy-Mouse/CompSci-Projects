@@ -1,0 +1,383 @@
+/*Make a program for an airplane seating.
+  plane has at least 13 rows
+  1-2 are first class, 3-7 are business class,8-13 are economy class
+
+  Input:
+    Ticket Type (first class, business class, or economy class)
+    Desired Seat
+  Output:
+    Whether or not the seat is available
+    if not available show seating chart and give another chance to request
+    If Available show it on the seating chart with updated change.
+
+*/
+#include <iostream>
+#include <iomanip>
+#include <cstdlib>
+#include <ctime>
+#include <bits/stdc++.h>
+
+using namespace std;
+
+const int ROWS_NUM = 13;
+const int SEATS_NUM = 6;
+
+void initArray(char[][ROWS_NUM][SEATS_NUM]);
+void displayPlane(char[][ROWS_NUM][SEATS_NUM], int[2]);
+void getSeatChoice(int[2]);
+bool checkAvaliable(char[][ROWS_NUM][SEATS_NUM], int[2], int);
+void bookSeat(char[][ROWS_NUM][SEATS_NUM], int[2], int);
+void cancelSeat(char[][ROWS_NUM][SEATS_NUM], int[2], int);
+void menu();
+char menuChoice();
+void menuAction(char, char[][ROWS_NUM][SEATS_NUM], int[2], int);
+void destination();
+void planeAction(char, char[][ROWS_NUM][SEATS_NUM], int[2], int);
+
+
+
+int main(){
+    char planeSeat[3][ROWS_NUM][SEATS_NUM];
+    int seatChoice[2];
+    char pick = 'T';
+    int flight = 3;
+    seatChoice[0] = 26;
+    seatChoice[1] = 11;
+
+
+    initArray(planeSeat);
+
+    do{
+        destination();
+        pick = menuChoice();
+        system("CLS");
+        planeAction(pick, planeSeat, seatChoice, flight);
+    }while (pick != 'X');
+
+    return 0;
+}
+
+
+void initArray(char data[][ROWS_NUM][SEATS_NUM]){
+    for (int p = 0; p < 3; p++){
+        for (int r = 0; r < ROWS_NUM; r++){
+            for (int s = 0; s < SEATS_NUM; s++){
+                data[p][r][s] = 'o';
+            }
+        }
+
+        for(int i = 0; i <15; i++){
+            int R = ((rand()+ time(0))%ROWS_NUM);
+            int S = ((rand()+ time(0))%SEATS_NUM);
+           // cout<<R<<" "<<S<<endl;
+            data[p][R][S] = 'x';
+        }
+    }
+
+}
+
+void displayPlane(char data[][ROWS_NUM][SEATS_NUM], int seatChoice[2], int flight){
+    system("Color 7");
+    cout<<"   \t    \t  A  B  C \tD  E  F";
+    cout<<"\n   First ----------------------------------\n";
+    for (int r = 0; r < ROWS_NUM; r++){
+        if(r==2){
+            cout<<"   Business ------------------------------\n";
+        }
+        if(r==7){
+            cout<<"   Economy --------------------------------\n";
+        }
+        cout<<"\t    "<<r+1<<"\t";
+        for (int s = 0; s < SEATS_NUM; s++){
+            if(s == 3){
+                cout<<"\t";
+            }
+
+            else{
+                //system("Color 7");
+                cout<<"  ";
+            }
+            cout<<data[flight][r][s];
+        }
+        cout<<endl;
+    }
+}
+
+void getSeatChoice(int seatChoice[2]){
+    string classType = "bob";
+    int row = 57;
+    char seat = 'R';
+    bool validSeat = true;
+
+    cout<<"Which class(first, business, economy) do you want: ";
+    cin>>classType;
+    transform(classType.begin(), classType.end(), classType.begin(), ::toupper);
+
+    if (classType == "FIRST"){
+        do{
+            validSeat = true;
+            cout<<"Please enter your choice as row then seat with a space in between. Ex. 3 A";
+            cout<<"Select a seat in rows 1 or 2: ";
+            cin>>row>>seat;
+            seat = toupper(seat);
+            if ((row != 1) && (row != 2)){
+               cout<<"Row not in First Class. ";
+               validSeat = false;
+            }
+            if ((seat != 'A') && (seat != 'B') && (seat != 'C') && (seat != 'D') && (seat != 'E') && (seat != 'F')){
+               cout<<"Invalid seat. ";
+               validSeat = false;
+            }
+        }while(!validSeat);
+    }
+
+   if (classType == "BUSINESS"){
+        do{
+            validSeat = true;
+            cout<<"Please enter your choice as row then seat with a space in between. Ex. 3 A";
+            cout<<"Select a seat in rows 3-7: ";
+            cin>>row>>seat;
+            seat = toupper(seat);
+            if ((row < 3) && (row > 7)){
+               cout<<"Row not in Business Class. ";
+               validSeat = false;
+            }
+            if ((seat != 'A') && (seat != 'B') && (seat != 'C') && (seat != 'D') && (seat != 'E') && (seat != 'F')){
+               cout<<"Invalid seat. ";
+               validSeat = false;
+            }
+        }while(!validSeat);
+    }
+
+    if (classType == "ECONOMY"){
+        do{
+            validSeat = true;
+            cout<<"Please enter your choice as row then seat with a space in between. Ex. 3 A";
+            cout<<"Select a seat in rows 8-13: ";
+            cin>>row>>seat;
+            seat = toupper(seat);
+            if ((row < 8) && (row > 13)){
+               cout<<"Row not in Business Class. ";
+               validSeat = false;
+            }
+            if ((seat != 'A') && (seat != 'B') && (seat != 'C') && (seat != 'D') && (seat != 'E') && (seat != 'F')){
+               cout<<"Invalid seat. ";
+               validSeat = false;
+            }
+        }while(!validSeat);
+    }
+
+    seatChoice[0] = row-1;
+
+    switch(seat){
+    case 'A': seatChoice[1] = 0;
+        break;
+    case 'B': seatChoice[1] = 1;
+        break;
+    case 'C': seatChoice[1] = 2;
+        break;
+    case 'D': seatChoice[1] = 3;
+        break;
+    case 'E': seatChoice[1] = 4;
+        break;
+    case 'F': seatChoice[1] = 5;
+        break;
+    }
+}
+
+bool checkAvaliable(char planeSeat[][ROWS_NUM][SEATS_NUM], int seatChoice[2], int flight){
+    bool isOpen = true;
+    if(planeSeat[flight][seatChoice[0]][seatChoice[1]] == 'o'){
+        isOpen = true;
+    }
+    else{
+        isOpen = false;
+    }
+    return isOpen;
+}
+
+void bookSeat(char planeSeat[][ROWS_NUM][SEATS_NUM], int seatChoice[2], int flight){
+    bool success = false;
+    cout<<"\n\n\t\tBook a seat";
+    do{
+        getSeatChoice(seatChoice);
+        checkAvaliable(planeSeat, seatChoice, flight);
+        if(checkAvaliable(planeSeat, seatChoice, flight)){
+            planeSeat[flight][seatChoice[0]][seatChoice[1]] = 'X';
+            success = true;
+        }
+        else{
+            cout<<"I'm sorry. That seat is taken. ";
+        }
+    }while(!success);
+}
+
+void cancelSeat(char planeSeat[][ROWS_NUM][SEATS_NUM], int seatChoice[2], int flight){
+    bool success = false;
+    cout<<"\n\n\t\tCancel a seat";
+    do{
+        getSeatChoice(seatChoice);
+        checkAvaliable(planeSeat, seatChoice, flight);
+        if(!checkAvaliable(planeSeat, seatChoice, flight)){
+            planeSeat[flight][seatChoice[0]][seatChoice[1]] = 'O';
+            success = true;
+        }
+        else{
+            cout<<"That seat is already available. ";
+        }
+    }while(!success);
+
+}
+
+
+void menu(){
+    cout<<"\n\t[S]ee Plane";
+    cout<<"\n\t[B]ook seat";
+    cout<<"\n\t[C]ancel seat\n";
+    cout<<"\tE[X]it\n\n\n";
+}
+
+char menuChoice(){
+    char pick;
+    cout<<"\tEnter your choice: ";
+    cin>>pick;
+    pick = toupper(pick);
+
+    return pick;
+}
+
+void menuAction(char pick, char planeSeat[][ROWS_NUM][SEATS_NUM], int seatChoice[2], int flight){
+    bool doAgain = false;
+    char repeat = 'R';
+
+    switch(pick){
+    case 'S':
+        system("CLS");
+        switch(flight){
+        case 0:cout<<"\tLondon\n\n";break;
+        case 1:cout<<"\tParis\n\n";break;
+        case 2:cout<<"\tRome\n\n";break;
+        }
+        displayPlane(planeSeat, seatChoice, flight);
+        system("pause");
+        system("CLS");
+        break;
+    case 'B':
+        do{
+            system("CLS");
+            switch(flight){
+            case 0:cout<<"\tLondon\n\n";break;
+            case 1:cout<<"\tParis\n\n";break;
+            case 2:cout<<"\tRome\n\n";break;
+            }
+
+            displayPlane(planeSeat, seatChoice, flight);
+            bookSeat(planeSeat, seatChoice, flight);
+            system("pause");
+            system("CLS");
+
+            switch(flight){
+            case 0:cout<<"\tLondon\n\n";break;
+            case 1:cout<<"\tParis\n\n";break;
+            case 2:cout<<"\tRome\n\n";break;
+            }
+
+            displayPlane(planeSeat, seatChoice, flight);
+            cout<<"\nDo you want to book another seat?(Y/N) ";
+            cin>>repeat;
+                if((repeat == 'y')|| (repeat == 'Y')){
+                    doAgain = true;
+                }
+                if((repeat == 'n')|| (repeat == 'N')){
+                    doAgain = false;
+                }
+        }while(doAgain);
+        system("CLS");
+        break;
+    case 'C':
+        do{
+            system("CLS");
+            switch(flight){
+            case 0:cout<<"\tLondon\n\n";break;
+            case 1:cout<<"\tParis\n\n";break;
+            case 2:cout<<"\tRome\n\n";break;
+            }
+            displayPlane(planeSeat, seatChoice, flight);
+            cancelSeat(planeSeat, seatChoice, flight);
+            system("pause");
+            system("CLS");
+
+            switch(flight){
+            case 0:cout<<"\tLondon\n\n";break;
+            case 1:cout<<"\tParis\n\n";break;
+            case 2:cout<<"\tRome\n\n";break;
+            }
+
+            displayPlane(planeSeat, seatChoice, flight);
+            cout<<"\nDo you want to cancel another seat?(Y/N) ";
+            cin>>repeat;
+                if((repeat == 'y')|| (repeat == 'Y')){
+                    doAgain = true;
+                }
+                if((repeat == 'n')|| (repeat == 'N')){
+                    doAgain = false;
+                }
+        }while(doAgain);
+        system("CLS");
+        break;
+    case 'X':
+        break;
+    default:
+        cout<<"Not an option\n";
+    }
+}
+
+
+void destination(){
+    cout<<"\n\tWhere do you want to go?";
+    cout<<"\n\t[L]ondon";
+    cout<<"\n\t[P]aris";
+    cout<<"\n\t[R]ome\n";
+    cout<<"\tE[X]it\n\n\n";
+}
+
+void planeAction(char pick, char planeSeat[][ROWS_NUM][SEATS_NUM], int seatChoice[2], int flight){
+    switch(pick){
+    case'L':
+        flight = 0;
+        do{
+            cout<<"\tLondon\n\n";
+            menu();
+            pick = menuChoice();
+            system("CLS");
+            menuAction(pick, planeSeat, seatChoice, flight);
+        }while (pick != 'X');
+        break;
+    case'P':
+        flight = 1;
+        do{
+            cout<<"\tParis\n\n";
+            menu();
+            pick = menuChoice();
+            system("CLS");
+            menuAction(pick, planeSeat, seatChoice, flight);
+        }while (pick != 'X');
+        break;
+    case'R':
+        flight = 2;
+        do{
+            cout<<"\tRome\n\n";
+            menu();
+            pick = menuChoice();
+            system("CLS");
+            menuAction(pick, planeSeat, seatChoice, flight);
+        }while (pick != 'X');
+        break;
+    case 'X':
+        cout<<"\n\tHave a great day!\n\n";
+        system("pause");
+        break;
+    default:
+        cout<<"Not an option\n";
+    }
+}
