@@ -1,43 +1,589 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<CodeBlocks_project_file>
-	<FileVersion major="1" minor="6" />
-	<Project>
-		<Option title="Checkers" />
-		<Option pch_mode="2" />
-		<Option compiler="gcc" />
-		<Build>
-			<Target title="Debug">
-				<Option output="bin/Debug/Checkers" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-g" />
-				</Compiler>
-			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/Checkers" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Release/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
-			</Target>
-		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-			<Add option="-fexceptions" />
-		</Compiler>
-		<Unit filename="main.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
-			<lib_finder disable_auto="1" />
-		</Extensions>
-	</Project>
-</CodeBlocks_project_file>
+#include <iostream>
+#include <iomanip>
+#include <cstdlib>
+#include <ctime>
+
+#include <windows.h>
+
+using namespace std;
+
+const int BOARD_SIZE = 8;
+
+bool isEven(int);
+void initArray(char[BOARD_SIZE][BOARD_SIZE]);
+void displayBoard(char[BOARD_SIZE][BOARD_SIZE], int[2]);
+
+void getPieceChoice(int[2]);
+bool checkAvaliable(char[BOARD_SIZE][BOARD_SIZE], int[2]);
+bool correctPiece(char[BOARD_SIZE][BOARD_SIZE], int[2]);
+void movePiece(char[BOARD_SIZE][BOARD_SIZE], int[2]);
+
+void computerMove(char[BOARD_SIZE][BOARD_SIZE], int[2]);
+bool endGame(char[BOARD_SIZE][BOARD_SIZE]);
+
+char menuChoice();
+void intro();
+
+int main(){
+    char board[BOARD_SIZE][BOARD_SIZE];
+    int pieceChoice[2];
+    char pick = 'T';
+    pieceChoice[0] = 26;
+    pieceChoice[1] = 11;
+
+
+    initArray(board);
+
+    intro();
+    displayBoard(board, pieceChoice);
+    while(!endGame(board)){
+        do{
+            getPieceChoice(pieceChoice);
+        }while(!correctPiece(board, pieceChoice));
+        movePiece(board, pieceChoice);
+
+        system("pause");
+        system("CLS");
+        displayBoard(board, pieceChoice);
+        system("pause");
+        system("CLS");
+
+        computerMove(board, pieceChoice);
+        displayBoard(board, pieceChoice);
+    }
+
+    return 0;
+}
+
+
+bool isEven(int integer){
+  if (integer % 2 == 0){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+void initArray(char data[BOARD_SIZE][BOARD_SIZE]){
+    for (int r = 0; r < BOARD_SIZE; r++){
+        for (int c = 0; c < BOARD_SIZE; c++){
+            if((isEven(r)) && (isEven(c))){
+                data[r][c] = '-';
+            }
+            else if((!isEven(r)) && (!isEven(c))){
+                data[r][c] = '-';
+            }
+            else{
+                data[r][c] = '+';
+            }
+        }
+    }
+
+    for (int r = 0; r < BOARD_SIZE; r++){
+        for (int c = 0; c < BOARD_SIZE; c++){
+            if((r<3) && (data[r][c] == '-')){
+                data[r][c] = 'o';
+            }
+            if((r>4) && (data[r][c] == '-')){
+                data[r][c] = 'x';
+            }
+        }
+    }
+}
+
+void displayBoard(char data[BOARD_SIZE][BOARD_SIZE], int pieceChoice[2]){
+    cout<<"\n    \t   A B C D E F G H\n";
+    for (int r = 0; r < BOARD_SIZE; r++){
+        cout<<"\t"<<r+1<<" ";
+        for (int s = 0; s < BOARD_SIZE; s++){
+                //cout;
+            cout<<" "<<data[r][s];
+        }
+        cout<<" "<<r+1<<endl;
+    }
+    cout<<"    \t   A B C D E F G H\n\n";
+}
+
+void getPieceChoice(int pieceChoice[2]){
+    string classType = "bob";
+    int row = 57;
+    char column = 'R';
+    bool validPiece = true;
+    do{
+        validPiece = true;
+        cout<<"Please enter your choice as row then column with a space in between. Ex. 3 A\n";
+        cout<<"Select a piece to move: ";
+        cin>>row>>column;
+        column = toupper(column);
+        if ((row < 1) && (row > 8)){
+            cout<<"Row not on board. ";
+            validPiece = false;
+        }
+        if ((column != 'A') && (column != 'B') && (column != 'C') && (column != 'D') && (column != 'E') && (column != 'F') && (column != 'G') && (column != 'H')){
+            cout<<"Invalid column. ";
+            validPiece = false;
+        }
+    }while(!validPiece);
+
+    pieceChoice[0] = row-1;
+
+    switch(column){
+    case 'A': pieceChoice[1] = 0;
+        break;
+    case 'B': pieceChoice[1] = 1;
+        break;
+    case 'C': pieceChoice[1] = 2;
+        break;
+    case 'D': pieceChoice[1] = 3;
+        break;
+    case 'E': pieceChoice[1] = 4;
+        break;
+    case 'F': pieceChoice[1] = 5;
+        break;
+    case 'G': pieceChoice[1] = 6;
+        break;
+    case 'H': pieceChoice[1] = 7;
+        break;
+    }
+}
+
+bool checkAvaliable(char data[BOARD_SIZE][BOARD_SIZE], int pieceChoice[2]){
+    bool isPiece = true;
+    if(data[pieceChoice[0]][pieceChoice[1]] != '-'){
+        isPiece = true;
+    }
+    else{
+        isPiece = false;
+    }
+    return isPiece;
+}
+
+bool correctPiece(char data[BOARD_SIZE][BOARD_SIZE], int pieceChoice[2]){
+    bool correct = false;
+    //cout<<endl<<pieceChoice[0]<<pieceChoice[1]<<endl;
+
+    if((checkAvaliable(data, pieceChoice))&&(data[pieceChoice[0]][pieceChoice[1]] == 'x')){
+        correct = true;
+    }
+
+    if ((checkAvaliable(data, pieceChoice))&&(data[pieceChoice[0]][pieceChoice[1]] == 'X')){
+        correct = true;
+    }
+    else if(!correct){
+        cout<<"That is not your piece. \n";
+    }
+    cout<<correct<<endl;
+    return correct;
+}
+
+void movePiece(char data[BOARD_SIZE][BOARD_SIZE], int pieceChoice[2]){
+    char pick = 'B';
+    if(data[pieceChoice[0]][pieceChoice[1]] == 'x'){
+        cout<<"Which direction do you want to go? ";
+        cout<<"[L]eft or [R]ight";
+        pick = menuChoice();
+        if(pick == 'L'){
+            if(data[pieceChoice[0]-1][pieceChoice[1]-1] == '-'){
+                data[pieceChoice[0]-1][pieceChoice[1]-1] = 'x';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                if(pieceChoice[0]-1 == 0){
+                    data[pieceChoice[0]-1][pieceChoice[1]-1] = 'X';
+                }
+            }
+            else if((data[pieceChoice[0]-1][pieceChoice[1]-1] == 'o')||(data[pieceChoice[0]-1][pieceChoice[1]-1] == 'O')){ // jumping
+                if(data[pieceChoice[0]-2][pieceChoice[1]-2] == '-'){
+                    data[pieceChoice[0]-2][pieceChoice[1]-2] = 'x';
+                    data[pieceChoice[0]][pieceChoice[1]] = '-';
+                    data[pieceChoice[0]-1][pieceChoice[1]-1] = '-';
+                    if(pieceChoice[0]-2 == 0){
+                        data[pieceChoice[0]-2][pieceChoice[1]-2] = 'X';
+                    }
+                }
+            }
+            else{cout<<"invalid move. turn forfeited. \n";}
+        }
+        if(pick == 'R'){
+            if(data[pieceChoice[0]-1][pieceChoice[1]+1] == '-'){
+                data[pieceChoice[0]-1][pieceChoice[1]+1] = 'x';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                if(pieceChoice[0]-1 == 0){
+                    data[pieceChoice[0]-1][pieceChoice[1]-1] = 'X';
+                }
+            }
+            else if((data[pieceChoice[0]-1][pieceChoice[1]+1] == 'o')||(data[pieceChoice[0]-1][pieceChoice[1]+1] == 'O')){ // jumping
+                if(data[pieceChoice[0]-2][pieceChoice[1]+2] == '-'){
+                    data[pieceChoice[0]-2][pieceChoice[1]+2] = 'x';
+                    data[pieceChoice[0]][pieceChoice[1]] = '-';
+                    data[pieceChoice[0]-1][pieceChoice[1]+1] = '-';
+                    if(pieceChoice[0]-2 == 0){
+                        data[pieceChoice[0]-2][pieceChoice[1]+2] = 'X';
+                    }
+                }
+            }
+            else{cout<<"invalid move. turn forfeited. \n";}
+        }
+    }
+    if((data[pieceChoice[0]][pieceChoice[1]] == 'X')){
+        cout<<"Which direction do you want to go? ";
+        cout<<"[F]orward or [B]ackward";
+        pick = menuChoice();
+
+        if(pick == 'F'){
+            cout<<"[L]eft or [R]ight";
+            pick = menuChoice();
+            if(pick == 'L'){
+                if(data[pieceChoice[0]-1][pieceChoice[1]-1] == '-'){
+                    data[pieceChoice[0]-1][pieceChoice[1]-1] = 'X';
+                    data[pieceChoice[0]][pieceChoice[1]] = '-';
+                }
+                else if((data[pieceChoice[0]-1][pieceChoice[1]-1] == 'o')||(data[pieceChoice[0]-1][pieceChoice[1]-1] == 'O')){ // jumping
+                    if(data[pieceChoice[0]-2][pieceChoice[1]-2] == '-'){
+                        data[pieceChoice[0]-2][pieceChoice[1]-2] = 'X';
+                        data[pieceChoice[0]][pieceChoice[1]] = '-';
+                        data[pieceChoice[0]-1][pieceChoice[1]-1] = '-';
+                    }
+                }
+                else{cout<<"invalid move. turn forfeited.";}
+            }
+            if(pick == 'R'){
+                if(data[pieceChoice[0]-1][pieceChoice[1]+1] == '-'){
+                    data[pieceChoice[0]-1][pieceChoice[1]+1] = 'X';
+                    data[pieceChoice[0]][pieceChoice[1]] = '-';
+                }
+                else if((data[pieceChoice[0]-1][pieceChoice[1]+1] == 'o')||(data[pieceChoice[0]-1][pieceChoice[1]+1] == 'O')){ // jumping
+                    if(data[pieceChoice[0]-2][pieceChoice[1]+2] == '-'){
+                        data[pieceChoice[0]-2][pieceChoice[1]+2] = 'X';
+                        data[pieceChoice[0]][pieceChoice[1]] = '-';
+                        data[pieceChoice[0]-1][pieceChoice[1]+1] = '-';
+                    }
+
+                }
+                else{cout<<"invalid move. turn forfeited.";}
+            }
+        }
+
+        if(pick == 'B'){
+            cout<<"[L]eft or [R]ight";
+            pick = menuChoice();
+            if(pick == 'L'){
+                if(data[pieceChoice[0]+1][pieceChoice[1]-1] == '-'){
+                    data[pieceChoice[0]+1][pieceChoice[1]-1] = 'X';
+                    data[pieceChoice[0]][pieceChoice[1]] = '-';
+                }
+                else if((data[pieceChoice[0]+1][pieceChoice[1]-1] == 'o')||(data[pieceChoice[0]+1][pieceChoice[1]+1] == 'O')){ // jumping
+                    if(data[pieceChoice[0]+2][pieceChoice[1]-2] == '-'){
+                        data[pieceChoice[0]+2][pieceChoice[1]-2] = 'X';
+                        data[pieceChoice[0]][pieceChoice[1]] = '-';
+                        data[pieceChoice[0]+1][pieceChoice[1]-1] = '-';
+                    }
+                }
+                else{cout<<"invalid move. turn forfeited.";}
+            }
+            if(pick == 'R'){
+                if(data[pieceChoice[0]+1][pieceChoice[1]+1] == '-'){
+                    data[pieceChoice[0]+1][pieceChoice[1]+1] = 'X';
+                    data[pieceChoice[0]][pieceChoice[1]] = '-';
+                }
+                else if((data[pieceChoice[0]+1][pieceChoice[1]+1] == 'o')||(data[pieceChoice[0]+1][pieceChoice[1]+1] == 'O')){ // jumping
+                    if(data[pieceChoice[0]+2][pieceChoice[1]+2] == '-'){
+                        data[pieceChoice[0]+2][pieceChoice[1]+2] = 'X';
+                        data[pieceChoice[0]][pieceChoice[1]] = '-';
+                        data[pieceChoice[0]+1][pieceChoice[1]+1] = '-';
+                    }
+                }
+                else{cout<<"invalid move. turn forfeited.";}
+            }
+        }
+    }
+}
+
+char menuChoice(){
+    char pick;
+    cout<<"\tEnter your choice: ";
+    cin>>pick;
+    pick = toupper(pick);
+    return pick;
+}
+
+void computerMove(char data[BOARD_SIZE][BOARD_SIZE], int pieceChoice[2]){
+    bool correct = false;
+    do{
+        do{
+            pieceChoice[0] = ((rand()+ time(0))%BOARD_SIZE);
+            pieceChoice[1] = ((rand()+ time(0))%BOARD_SIZE);
+            if((checkAvaliable(data, pieceChoice))&&((data[pieceChoice[0]][pieceChoice[1]] == 'o')|| (data[pieceChoice[0]][pieceChoice[1]] == 'O'))){
+                correct = true;
+            }
+        }while(!correct);
+
+        int side = 3;
+        int frontBack = 3;
+        int tries = 0;
+        correct = false;
+
+        bool fl = false, fr = false, bl = false, br = false;
+        bool jfl = false, jfr = false, jbl = false, jbr = false;
+        int moves[8] = {NULL};
+        int slot = 0;
+
+        if(data[pieceChoice[0]][pieceChoice[1]] == 'o'){    //normal piece
+            if(data[pieceChoice[0]+1][pieceChoice[1]-1] == '-'){//test if can move left
+                fl = true;
+                moves[slot] = 1;
+                slot++;
+            }
+            else if((data[pieceChoice[0]+1][pieceChoice[1]-1] == 'x')||(data[pieceChoice[0]+1][pieceChoice[1]-1] == 'X')){ // test if can jump left
+                if(data[pieceChoice[0]+2][pieceChoice[1]-2] == '-'){
+                    jfl = true;
+                    moves[slot] = 3;
+                    slot++;
+                }
+            }
+            if(data[pieceChoice[0]+1][pieceChoice[1]+1] == '-'){//test if can move right
+                fr = true;
+                moves[slot] = 2;
+                slot++;
+            }
+            else if((data[pieceChoice[0]+1][pieceChoice[1]+1] == 'x')||(data[pieceChoice[0]+1][pieceChoice[1]+1] == 'X')){ // test if can jump left
+                if(data[pieceChoice[0]+2][pieceChoice[1]+2] == '-'){
+                    jfr = true;
+                    moves[slot] = 4;
+                    slot++;
+                }
+            }
+
+            int pick = 23;
+
+            if (slot == 0){
+                pick = 0;
+            }
+            else if (slot == 1){
+                pick = ((rand()+ time(0))% 2);
+            }
+            else if (slot == 2){
+                pick = ((rand()+ time(0))% 3);
+            }
+
+            else if (slot == 3){
+                pick = ((rand()+ time(0))% 4);
+            }
+
+
+            if(moves[pick] == 1){ //move forward left
+                data[pieceChoice[0]+1][pieceChoice[1]-1] = 'o';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                if(pieceChoice[0]+1 == 7){
+                    data[pieceChoice[0]+1][pieceChoice[1]-1] = 'O';
+                }
+                correct = true;
+            }
+            if(moves[pick] == 2){ //move forward right
+                data[pieceChoice[0]+1][pieceChoice[1]+1] = 'o';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                if(pieceChoice[0]+1 == 7){
+                    data[pieceChoice[0]+1][pieceChoice[1]+1] = 'O';
+                }
+                correct = true;
+            }
+            if(moves[pick] == 3){ //jump forward left
+                data[pieceChoice[0]+2][pieceChoice[1]-2] = 'o';
+                data[pieceChoice[0]+1][pieceChoice[1]-1] = '-';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                if(pieceChoice[0]+2 == 7){
+                    data[pieceChoice[0]+2][pieceChoice[1]-2] = 'O';
+                }
+                correct = true;
+            }
+            if(moves[pick] == 4){ //jump forward right
+                data[pieceChoice[0]+2][pieceChoice[1]+2] = 'o';
+                data[pieceChoice[0]+1][pieceChoice[1]+1] = '-';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                if(pieceChoice[0]+2 == 7){
+                    data[pieceChoice[0]+2][pieceChoice[1]+2] = 'O';
+                }
+                correct = true;
+            }
+            //else{correct = false;}
+        }
+
+
+        if(data[pieceChoice[0]][pieceChoice[1]] == 'O'){    //king
+            if(data[pieceChoice[0]+1][pieceChoice[1]-1] == '-'){//test if can move front left
+                fl = true;
+                moves[slot] = 1;
+                slot++;
+            }
+            else if((data[pieceChoice[0]+1][pieceChoice[1]-1] == 'x')||(data[pieceChoice[0]+1][pieceChoice[1]-1] == 'X')){ // test if can jump forward left
+                if(data[pieceChoice[0]+2][pieceChoice[1]-2] == '-'){
+                    jfl = true;
+                    moves[slot] = 3;
+                    slot++;
+                }
+            }
+            if(data[pieceChoice[0]+1][pieceChoice[1]+1] == '-'){//test if can move front right
+                fr = true;
+                moves[slot] = 2;
+                slot++;
+            }
+             else if((data[pieceChoice[0]+1][pieceChoice[1]+1] == 'x')||(data[pieceChoice[0]+1][pieceChoice[1]+1] == 'X')){ // test if can jump forward right
+                if(data[pieceChoice[0]+2][pieceChoice[1]+2] == '-'){
+                    jfr = true;
+                    moves[slot] = 4;
+                    slot++;
+                }
+            }
+            if(data[pieceChoice[0]-1][pieceChoice[1]-1] == '-'){//test if can move back right
+                bl = true;
+                moves[slot] = 3;
+                slot++;
+            }
+            else if((data[pieceChoice[0]-1][pieceChoice[1]-1] == 'x')||(data[pieceChoice[0]-1][pieceChoice[1]-1] == 'X')){ // test if can jump backward left
+                if(data[pieceChoice[0]-2][pieceChoice[1]-2] == '-'){
+                    jbl = true;
+                    moves[slot] = 3;
+                    slot++;
+                }
+            }
+            if(data[pieceChoice[0]-1][pieceChoice[1]+1] == '-'){//test if can move right
+                br = true;
+                moves[slot] = 4;
+                slot++;
+            }
+            else if((data[pieceChoice[0]-1][pieceChoice[1]+1] == 'x')||(data[pieceChoice[0]-1][pieceChoice[1]+1] == 'X')){ // test if can jump backward right
+                if(data[pieceChoice[0]-2][pieceChoice[1]+2] == '-'){
+                    jbr = true;
+                    moves[slot] = 4;
+                    slot++;
+                }
+            }
+
+            int pick = 57;
+
+            if (slot == 0){
+                pick = 0;
+            }
+            else if (slot == 1){
+                pick = ((rand()+ time(0))% 2);
+            }
+            else if (slot == 2){
+                pick = ((rand()+ time(0))% 3);
+            }
+            else if (slot == 3){
+                pick = ((rand()+ time(0))% 4);
+            }
+             else if (slot == 4){
+                pick = ((rand()+ time(0))% 5);
+            }
+            else if (slot == 5){
+                pick = ((rand()+ time(0))% 6);
+            }
+            else if (slot == 6){
+                pick = ((rand()+ time(0))% 7);
+            }
+             else if (slot == 7){
+                pick = ((rand()+ time(0))% 8);
+            }
+
+
+            if(moves[pick] == 1){ //move forward left
+                data[pieceChoice[0]+1][pieceChoice[1]-1] = 'O';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                correct = true;
+            }
+            if(moves[pick] == 2){ //move forward right
+                data[pieceChoice[0]+1][pieceChoice[1]+1] = 'O';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                correct = true;
+            }
+            if(moves[pick] == 3){ //move backward left
+                data[pieceChoice[0]-1][pieceChoice[1]-1] = 'O';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                correct = true;
+            }
+            if(moves[pick] == 4){ //move backward right
+                data[pieceChoice[0]-1][pieceChoice[1]+1] = 'O';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                correct = true;
+            }
+            if(moves[pick] == 5){ //jump forward left
+                data[pieceChoice[0]+2][pieceChoice[1]-2] = 'O';
+                data[pieceChoice[0]+1][pieceChoice[1]-1] = '-';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                correct = true;
+            }
+            if(moves[pick] == 6){ //jump forward right
+                data[pieceChoice[0]+2][pieceChoice[1]+2] = 'O';
+                data[pieceChoice[0]+1][pieceChoice[1]+1] = '-';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                correct = true;
+            }
+            if(moves[pick] == 7){ //jump backward left
+                data[pieceChoice[0]-2][pieceChoice[1]-2] = 'O';
+                data[pieceChoice[0]-1][pieceChoice[1]-1] = '-';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                correct = true;
+            }
+            if(moves[pick] == 8){ //jump backward right
+                data[pieceChoice[0]-2][pieceChoice[1]+2] = 'O';
+                data[pieceChoice[0]-1][pieceChoice[1]+1] = '-';
+                data[pieceChoice[0]][pieceChoice[1]] = '-';
+                correct = true;
+            }
+
+            //else{correct = false;}
+
+        }
+
+        //else{correct = false;}
+
+    }while(!correct);
+
+}
+
+bool endGame(char data[BOARD_SIZE][BOARD_SIZE]){
+    int xNum = 0;
+    int oNum = 0;
+    for (int r = 0; r < BOARD_SIZE; r++){
+        for (int c = 0; c < BOARD_SIZE; c++){
+            if((data[r][c] == 'o')||(data[r][c] == 'O')){
+                oNum++;
+            }
+            if((data[r][c] == 'x')||(data[r][c] == 'X')){
+                xNum++;
+            }
+        }
+    }
+
+    if((oNum == 0)&&(xNum > 0)){
+        return true;
+    }
+    if((oNum > 0)&&(xNum == 0)){
+        return true;
+    }
+    else{return false;}
+}
+
+void intro(){
+    cout<<"\n\n\tWelcome to Checkers!\n\n";
+    Sleep(2000);
+    system("pause");
+    cout<<"\n\t\tRules\n\n";
+    cout<<"\tYou play against the computer. You are the X's and it is the O's.\n";
+    cout<<"\tThe game is over when all of one kind of piece has been captured\n\n";
+    Sleep(1000);
+    cout<<"   Moving:\n";
+    cout<<"\tPick a piece by entering its coordinate location. Ex: 3 A\n";
+    cout<<"\tThen choose which direction you want to move: \n\t\tleft, right, forward (towards the top), backward (towards the bottom)\n";
+    cout<<"\tPieces only move forwards unless they are kings.\n\n";
+    cout<<"\tJumping is not required but highly suggested. Only one jump per turn\n";
+    cout<<"\tDouble jumps are not supported in this program. Wait until your next turn to jump again.\n\n";
+    cout<<"\tMoving out of bound of the board results in an invalid move and you forfeit your turn.\n";
+    cout<<"\tOnce you reach the other end of the board, your piece become a king (shown in uppercase).\n\tKings can move both forwards and backwards.\n\n";
+    Sleep(5000);
+    cout<<"\tGood Luck!\n\n\n";
+    system("pause");
+    system("CLS");
+}
+
+
