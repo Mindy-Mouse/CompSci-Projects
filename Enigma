@@ -1,0 +1,283 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+const int ALPHA = 26;
+
+void init(vector<int> &);
+void preset(vector<int>&, int);
+void displayWheels(vector<int> &, vector<int> &, vector<int> &);
+int letterToNum(char);
+int codeWiring1(vector<int>&, int);
+int codeWiring2(vector<int>&, int);
+int codeWiring3(vector<int>&, int);
+int codeWiringRef(vector<int>&, int);
+
+
+int main(){
+    vector<int> wheel1;
+    vector<int> wheel2;
+    vector<int> wheel3;
+    vector<int> reflector;
+
+    int set1, set2, set3;
+
+    init(wheel1);
+    init(wheel2);
+    init(wheel3);
+    init(reflector);
+
+    displayWheels(wheel1, wheel2, wheel3);
+
+    preset(wheel1, 5);
+    preset(wheel2, 17);
+    preset(wheel3, 22);
+    displayWheels(wheel1, wheel2, wheel3);
+
+    return 0;
+}
+
+
+void init(vector<int> &wheel){
+    for(int i = 0; i < ALPHA; i++){
+        wheel.push_back(i+1);
+    }
+}
+
+void displayWheels(vector<int> &wheel1, vector<int> &wheel2, vector<int> &wheel3){
+    for(int i = 0; i < ALPHA; i++){
+        cout<<wheel1[i]<<" ";
+    }
+    cout<<endl<<endl;
+    for(int i = 0; i < ALPHA; i++){
+        cout<<wheel2[i]<<" ";
+    }
+    cout<<endl<<endl;
+    for(int i = 0; i < ALPHA; i++){
+        cout<<wheel3[i]<<" ";
+    }
+    cout<<endl<<endl;
+}
+
+void preset(vector<int> &wheel, int setting){
+    while(wheel.front() != setting){
+        wheel.push_back(wheel[0]);
+        wheel.erase(wheel.begin());
+    }
+}
+
+int letterToNum(char letter){
+    int letternum = 0;
+    letter = toupper(letter);
+
+    switch(letter){
+    case 'A': letternum = 1; break;
+    case 'B': letternum = 2; break;
+    case 'C': letternum = 3; break;
+    case 'D': letternum = 4; break;
+    case 'E': letternum = 5; break;
+    case 'F': letternum = 6; break;
+    case 'G': letternum = 7; break;
+    case 'H': letternum = 8; break;
+    case 'I': letternum = 9; break;
+    case 'J': letternum = 10; break;
+    case 'K': letternum = 11; break;
+    case 'L': letternum = 12; break;
+    case 'M': letternum = 13; break;
+    case 'N': letternum = 14; break;
+    case 'O': letternum = 15; break;
+    case 'P': letternum = 16; break;
+    case 'Q': letternum = 17; break;
+    case 'R': letternum = 18; break;
+    case 'S': letternum = 19; break;
+    case 'T': letternum = 20; break;
+    case 'U': letternum = 21; break;
+    case 'V': letternum = 22; break;
+    case 'W': letternum = 23; break;
+    case 'X': letternum = 24; break;
+    case 'Y': letternum = 25; break;
+    case 'Z': letternum = 26; break;
+    }
+
+    return letternum;
+}
+
+int codeWiring1(vector<int> &wheel1, int letternum){
+    int inLetter, outLetter, index;
+
+    inLetter = wheel1[letternum];
+
+    switch(inLetter){
+    case 5: outLetter = 1; break;
+    case 11: outLetter = 2; break;
+    case 13: outLetter = 3; break;
+    case 6: outLetter = 4; break;
+    case 12: outLetter = 5; break;
+    case 7: outLetter = 6; break;
+    case 4: outLetter = 7; break;
+    case 17: outLetter = 8; break;
+    case 22: outLetter = 9; break;
+    case 26: outLetter = 10; break;
+    case 14: outLetter = 11; break;
+    case 20: outLetter = 12; break;
+    case 15: outLetter = 13; break;
+    case 23: outLetter = 14; break;
+    case 25: outLetter = 15; break;
+    case 8: outLetter = 16; break;
+    case 24: outLetter = 17; break;
+    case 21: outLetter = 18; break;
+    case 19: outLetter = 19; break;
+    case 16: outLetter = 20; break;
+    case 1: outLetter = 21; break;
+    case 9: outLetter = 22; break;
+    case 2: outLetter = 23; break;
+    case 18: outLetter = 24; break;
+    case 3: outLetter = 25; break;
+    case 10: outLetter = 26; break;
+    }
+
+    for(int i = 0; i < ALPHA; i++){
+        if(wheel1[i] == outLetter){
+            index = i;
+            i = 30;
+        }
+    }
+
+    return index;
+}
+
+
+int codeWiring2(vector<int> &wheel2, int letternum){
+    int inLetter, outLetter, index;
+
+    inLetter = wheel2[letternum];
+
+    switch(inLetter){
+    case 1: outLetter = 1; break;
+    case 10: outLetter = 2; break;
+    case 4: outLetter = 3; break;
+    case 11: outLetter = 4; break;
+    case 19: outLetter = 5; break;
+    case 9: outLetter = 6; break;
+    case 18: outLetter = 7; break;
+    case 21: outLetter = 8; break;
+    case 24: outLetter = 9; break;
+    case 2: outLetter = 10; break;
+    case 12: outLetter = 11; break;
+    case 8: outLetter = 12; break;
+    case 23: outLetter = 13; break;
+    case 20: outLetter = 14; break;
+    case 13: outLetter = 15; break;
+    case 3: outLetter = 16; break;
+    case 17: outLetter = 17; break;
+    case 7: outLetter = 18; break;
+    case 26: outLetter = 19; break;
+    case 14: outLetter = 20; break;
+    case 16: outLetter = 21; break;
+    case 25: outLetter = 22; break;
+    case 6: outLetter = 23; break;
+    case 22: outLetter = 24; break;
+    case 15: outLetter = 25; break;
+    case 5: outLetter = 26; break;
+    }
+
+    for(int i = 0; i < ALPHA; i++){
+        if(wheel2[i] == outLetter){
+            index = i;
+            i = 30;
+        }
+    }
+
+    return index;
+}
+
+int codeWiring3(vector<int> &wheel3, int letternum){
+    int inLetter, outLetter, index;
+
+    inLetter = wheel3[letternum];
+
+    switch(inLetter){
+    case 2: outLetter = 1; break;
+    case 4: outLetter = 2; break;
+    case 6: outLetter = 3; break;
+    case 8: outLetter = 4; break;
+    case 10: outLetter = 5; break;
+    case 12: outLetter = 6; break;
+    case 3: outLetter = 7; break;
+    case 16: outLetter = 8; break;
+    case 18: outLetter = 9; break;
+    case 20: outLetter = 10; break;
+    case 24: outLetter = 11; break;
+    case 22: outLetter = 12; break;
+    case 26: outLetter = 13; break;
+    case 14: outLetter = 14; break;
+    case 25: outLetter = 15; break;
+    case 5: outLetter = 16; break;
+    case 9: outLetter = 17; break;
+    case 23: outLetter = 18; break;
+    case 7: outLetter = 19; break;
+    case 1: outLetter = 20; break;
+    case 11: outLetter = 21; break;
+    case 13: outLetter = 22; break;
+    case 21: outLetter = 23; break;
+    case 19: outLetter = 24; break;
+    case 17: outLetter = 25; break;
+    case 15: outLetter = 26; break;
+    }
+
+    for(int i = 0; i < ALPHA; i++){
+        if(wheel3[i] == outLetter){
+            index = i;
+            i = 30;
+        }
+    }
+
+    return index;
+}
+
+int codeWiringRef(vector<int> &reflector, int letternum){
+    int inLetter, outLetter, index;
+
+    inLetter = reflector[letternum];
+
+    switch(inLetter){
+    case 25: outLetter = 1; break;
+    case 18: outLetter = 2; break;
+    case 21: outLetter = 3; break;
+    case 8: outLetter = 4; break;
+    case 17: outLetter = 5; break;
+    case 19: outLetter = 6; break;
+    case 12: outLetter = 7; break;
+    case 4: outLetter = 8; break;
+    case 16: outLetter = 9; break;
+    case 24: outLetter = 10; break;
+    case 14: outLetter = 11; break;
+    case 7: outLetter = 12; break;
+    case 15: outLetter = 13; break;
+    case 11: outLetter = 14; break;
+    case 13: outLetter = 15; break;
+    case 9: outLetter = 16; break;
+    case 5: outLetter = 17; break;
+    case 2: outLetter = 18; break;
+    case 6: outLetter = 19; break;
+    case 26: outLetter = 20; break;
+    case 3: outLetter = 21; break;
+    case 23: outLetter = 22; break;
+    case 22: outLetter = 23; break;
+    case 10: outLetter = 24; break;
+    case 1: outLetter = 25; break;
+    case 20: outLetter = 26; break;
+    }
+
+    for(int i = 0; i < ALPHA; i++){
+        if(reflector[i] == outLetter){
+            index = i;
+            i = 30;
+        }
+    }
+
+    return index;
+}
+
+
+
